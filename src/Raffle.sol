@@ -115,4 +115,8 @@ contract Raffle is VRFConsumerBaseV2Plus{
         }
         contestants = new address payable[](0);
     }
+
+    function getInterval()public view returns(uint256){
+        return lotteryInterval;
+    }
 }

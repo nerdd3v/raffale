@@ -38,7 +38,7 @@ contract NetworkConfig is CodeConstants, Script{
             VRFCoordinatorV2_5Mock mock = new VRFCoordinatorV2_5Mock(baseFee, gasPriceLink, weiPerUnitLink);
             vm.stopBroadcast();
             return forConstructor({
-                lotteryInterval: 20,
+                lotteryInterval: 28,
                 coordinator: address(mock)
             });
         }
