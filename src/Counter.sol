@@ -13,7 +13,7 @@ contract Counter {
     address private immutable priceFeed;
     address private immutable owner;
     address payable[] private contestants;
-    uint256 private interval;
+    uint256 private immutable interval;
 
     constructor(address _priceFeed, uint256 _interval){
         priceFeed = _priceFeed;
