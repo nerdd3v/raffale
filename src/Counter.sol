@@ -47,5 +47,5 @@ contract Counter {
 
     event raffleEntered(
         address indexed contenstant
-    )
+    );
 }
