@@ -2,24 +2,24 @@
 pragma solidity ^0.8.9;
 
 import {AggregatorV3Interface} from "lib/chainlink-brownie-contracts/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
+import {VRFConsumerBaseV2Plus} from "lib/chainlink-brownie-contracts/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
 
-// eth -> usd
 
 error notEnoughEth();
 error notEnoughTimePassed();
 
-contract Counter {
+contract Counter is VRFConsumerBaseV2Plus{
     
     uint256 private constant entryFeeInUSD = 5;
     address private immutable priceFeed;
-    address private immutable owner;
+    address private immutable c_owner;
     address payable[] private contestants;
     uint256 private immutable interval;
     uint256 private lastTimeStamp;
 
-    constructor(address _priceFeed, uint256 _interval){
+    constructor(address _priceFeed, uint256 _interval, address vrfCoordinator)VRFConsumerBaseV2Plus(vrfCoordinator){
         priceFeed = _priceFeed;
-        owner = msg.sender;
+        c_owner = msg.sender;
         interval = _interval;
         lastTimeStamp = block.timestamp;
     }
@@ -49,10 +49,15 @@ contract Counter {
         return answer;
     }
 
+    function fulfillRandomWords(uint256 requestId, uint256[] calldata randomWords)internal override{
+        
+    }
+
     function pickWinner()public {
         if((block.timestamp - lastTimeStamp) < interval){
             revert notEnoughTimePassed();
         }
+
     }
 
     event raffleEntered(
