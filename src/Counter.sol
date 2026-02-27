@@ -30,6 +30,7 @@ contract Counter {
             revert notEnoughEth();
         }
         contestants.push(payable(msg.sender));
+        emit raffleEntered(msg.sender);
     }
 
     function calculateETH2USD()public view returns(uint256){
@@ -43,4 +44,8 @@ contract Counter {
         uint256 answer = (entryFeeInUSD * 1e18) / uint256( result);
         return answer;
     }
+
+    event raffleEntered(
+        address indexed contenstant
+    )
 }
