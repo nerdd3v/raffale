@@ -50,7 +50,7 @@ contract Counter {
     }
 
     function pickWinner()public {
-        if((block.timestamp - lastTimeStamp) > interval){
+        if((block.timestamp - lastTimeStamp) < interval){
             revert notEnoughTimePassed();
         }
     }
