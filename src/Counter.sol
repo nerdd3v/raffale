@@ -6,6 +6,7 @@ import {AggregatorV3Interface} from "lib/chainlink-brownie-contracts/contracts/s
 // eth -> usd
 
 error notEnoughEth();
+error notEnoughTimePassed();
 
 contract Counter {
     
@@ -14,11 +15,13 @@ contract Counter {
     address private immutable owner;
     address payable[] private contestants;
     uint256 private immutable interval;
+    uint256 private lastTimeStamp;
 
     constructor(address _priceFeed, uint256 _interval){
         priceFeed = _priceFeed;
         owner = msg.sender;
         interval = _interval;
+        lastTimeStamp = block.timestamp;
     }
 
     function getterFeed()public view returns(AggregatorV3Interface){
@@ -44,6 +47,12 @@ contract Counter {
         // x eth -> 5 usd
         uint256 answer = (entryFeeInUSD * 1e18) / uint256( result);
         return answer;
+    }
+
+    function pickWinner()public {
+        if((block.timestamp - lastTimeStamp) > interval){
+            revert notEnoughTimePassed();
+        }
     }
 
     event raffleEntered(
