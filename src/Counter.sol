@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 
 import {AggregatorV3Interface} from "lib/chainlink-brownie-contracts/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 import {VRFConsumerBaseV2Plus} from "lib/chainlink-brownie-contracts/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
-
+import {VRFV2PlusClient} from "lib/chainlink-brownie-contracts/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 
 error notEnoughEth();
 error notEnoughTimePassed();
@@ -50,7 +50,7 @@ contract Counter is VRFConsumerBaseV2Plus{
     }
 
     function fulfillRandomWords(uint256 requestId, uint256[] calldata randomWords)internal override{
-        
+
     }
 
     function pickWinner()public {
@@ -58,6 +58,11 @@ contract Counter is VRFConsumerBaseV2Plus{
             revert notEnoughTimePassed();
         }
 
+        uint256 requestId = s_vrfCoordinator(
+            VRFV2PlusClient.RandomWordsRequest({
+
+            })
+        );
     }
 
     event raffleEntered(
