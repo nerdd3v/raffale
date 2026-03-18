@@ -19,6 +19,7 @@ contract Raffle is VRFConsumerBaseV2Plus{
     IVRFCoordinatorV2Plus public coordinator;
     uint256 public rw;
 
+
     event raffleEntered(address indexed player);
     event winnerDeclare(address indexed winner);
 
