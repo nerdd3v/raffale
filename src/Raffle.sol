@@ -10,6 +10,7 @@ error timeError();
 
 contract Raffle is VRFConsumerBaseV2Plus{
     
+    enum State {Open, Closed}
     uint256 private constant entryFeeInWei = 100;
     // address private immutable owner;
     address payable[] contestants;
@@ -18,6 +19,7 @@ contract Raffle is VRFConsumerBaseV2Plus{
     uint256 private s_requestId;
     IVRFCoordinatorV2Plus public coordinator;
     uint256 public rw;
+    
 
 
     event raffleEntered(address indexed player);
