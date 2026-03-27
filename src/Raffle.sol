@@ -7,6 +7,7 @@ import {VRFV2PlusClient} from "lib/chainlink-brownie-contracts/contracts/src/v0.
 
 error notEnoughEth();
 error timeError();
+error raffleNotOpen();
 
 contract Raffle is VRFConsumerBaseV2Plus{
     
@@ -35,6 +36,11 @@ contract Raffle is VRFConsumerBaseV2Plus{
     }
 
     function enterRaffle()public payable{
+
+        if(state != State.Open){
+            revert raffleNotOpen();
+        }
+
         if(msg.value < entryFeeInWei){
             revert notEnoughEth();
         }
@@ -70,11 +76,17 @@ contract Raffle is VRFConsumerBaseV2Plus{
             revert("no people in raffale");
         }
         uint256 winnerIndex = randomWords[0] % contestants.length;
-        lastTimeStamp = block.timestamp;
-        emit winnerDeclare(contestants[winnerIndex]);
         state = State.Open;
+        lastTimeStamp = block.timestamp;
 
         (bool success,) = contestants[winnerIndex].call{value: address(this).balance}("");
+
+        if(success){
+            emit winnerDeclare(contestants[winnerIndex]);
+        }
+        else{
+            revert("the winner cannot be funded");
+        }
         contestants = new address payable[](0);
     }
 
