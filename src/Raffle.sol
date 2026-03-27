@@ -68,7 +68,7 @@ contract Raffle is VRFConsumerBaseV2Plus{
         state = State.Closed;
         uint256 winnerIndex = contestants.length % randomWords[0];
         lastTimeStamp = block.timestamp;
-        emit pickWinner(contestants[winnerIndex]);
+        emit winnerDeclare(contestants[winnerIndex]);
         contestants = new address payable[](0);
         state = State.Open;
 
