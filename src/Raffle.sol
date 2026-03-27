@@ -49,7 +49,7 @@ contract Raffle is VRFConsumerBaseV2Plus{
         emit raffleEntered(msg.sender);
     }
 
-    function pickWinner()public {
+    function requestingCoordinator()public {
         if(block.timestamp - lastTimeStamp < lotteryInterval){
             revert timeError();
         }
@@ -89,6 +89,4 @@ contract Raffle is VRFConsumerBaseV2Plus{
         }
         contestants = new address payable[](0);
     }
-
-
 }
