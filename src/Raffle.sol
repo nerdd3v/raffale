@@ -19,7 +19,8 @@ contract Raffle is VRFConsumerBaseV2Plus{
     uint256 private s_requestId;
     IVRFCoordinatorV2Plus public coordinator;
     uint256 public rw;
-    
+
+    State private state; 
 
 
     event raffleEntered(address indexed player);
@@ -30,6 +31,7 @@ contract Raffle is VRFConsumerBaseV2Plus{
         lotteryInterval = _lotteryInterval;
         lastTimeStamp = block.timestamp;
         coordinator = IVRFCoordinatorV2Plus(_vrfCoordinator);
+        state = State.Open;
     }
 
     function enterRaffle()public payable{
