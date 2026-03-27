@@ -65,7 +65,14 @@ contract Raffle is VRFConsumerBaseV2Plus{
     }
 
     function fulfillRandomWords(uint256 requestId, uint256[] calldata randomWords) internal override{
-        rw = randomWords[0];
+        state = State.Closed;
+        uint256 winnerIndex = contestants.length % randomWords[0];
+        lastTimeStamp = block.timestamp;
+        emit pickWinner(contestants[winnerIndex]);
+        contestants = new address payable[](0);
+        state = State.Open;
+
+        (bool success,) = contestants[winnerIndex].call{value: address(this).balance}("");
     }
 
 
