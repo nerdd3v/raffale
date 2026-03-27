@@ -40,9 +40,9 @@ contract Raffle is VRFConsumerBaseV2Plus{
     }
 
     function pickWinner()public {
-        // if(block.timestamp - lastTimeStamp < lotteryInterval){
-        //     revert timeError();
-        // }
+        if(block.timestamp - lastTimeStamp < lotteryInterval){
+            revert timeError();
+        }
 
         VRFV2PlusClient.RandomWordsRequest memory request = VRFV2PlusClient.RandomWordsRequest({
             keyHash: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae,
