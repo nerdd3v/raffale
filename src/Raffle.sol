@@ -18,7 +18,7 @@ contract Raffle is VRFConsumerBaseV2Plus{
     uint256 private lastTimeStamp;
     uint256 private s_requestId;
     IVRFCoordinatorV2Plus public coordinator;
-    uint256 public rw;
+    // uint256 public rw;
 
     State private state; 
 
@@ -47,6 +47,7 @@ contract Raffle is VRFConsumerBaseV2Plus{
         if(block.timestamp - lastTimeStamp < lotteryInterval){
             revert timeError();
         }
+        state = State.Closed;
 
         VRFV2PlusClient.RandomWordsRequest memory request = VRFV2PlusClient.RandomWordsRequest({
             keyHash: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae,
@@ -65,18 +66,17 @@ contract Raffle is VRFConsumerBaseV2Plus{
     }
 
     function fulfillRandomWords(uint256 requestId, uint256[] calldata randomWords) internal override{
-        state = State.Closed;
-        uint256 winnerIndex = contestants.length % randomWords[0];
+        if (contestants.length == 0){
+            revert("no people in raffale");
+        }
+        uint256 winnerIndex = randomWords[0] % contestants.length;
         lastTimeStamp = block.timestamp;
         emit winnerDeclare(contestants[winnerIndex]);
-        contestants = new address payable[](0);
         state = State.Open;
 
         (bool success,) = contestants[winnerIndex].call{value: address(this).balance}("");
+        contestants = new address payable[](0);
     }
 
 
-    function getRandomWord()public returns(uint256){
-        return rw;
-    }
 }
