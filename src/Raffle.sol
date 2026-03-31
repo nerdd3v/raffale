@@ -8,6 +8,7 @@ import {VRFV2PlusClient} from "lib/chainlink-brownie-contracts/contracts/src/v0.
 error notEnoughEth();
 error timeError();
 error raffleNotOpen();
+error noUpkeepNeeded();
 
 contract Raffle is VRFConsumerBaseV2Plus{
     
@@ -66,9 +67,10 @@ contract Raffle is VRFConsumerBaseV2Plus{
         return (timeHasPassed && isOpen && contractHasBalance && hasPlayers , "");
     }
 
-    function requestingCoordinator()public {
-        if(block.timestamp - lastTimeStamp < lotteryInterval){
-            revert timeError();
+    function performUpkeep()public {
+        (bool upkeepNeeded,) = checkUpKeep(""); 
+        if(upkeepNeeded == false){
+            revert noUpkeepNeeded();
         }
         state = State.Closed;
 
