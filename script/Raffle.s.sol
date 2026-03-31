@@ -14,9 +14,14 @@ contract RaffleScript is Script{
         configContract = new NetworkConfig();
     }
 
-    function run()public{
+    function run()public returns(Raffle){
         vm.startBroadcast();
             networkConfiguration = configContract.getNetworkConfig(block.chainid);
+            raffle = new Raffle({
+                _lotteryInterval: networkConfiguration.lotteryInterval,
+                _vrfCoordinator: networkConfiguration.coordinator
+            });
         vm.stopBroadcast();
+        return raffle;
     }
 }
