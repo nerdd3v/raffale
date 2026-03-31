@@ -14,4 +14,7 @@ contract RaffleScript is Script{
         raffle = new Raffle(20, 0x9DdfaCa8183c41ad55329BdeeD9F6A8d53168B1B);
         vm.stopBroadcast();
     }
+    function deployRaffle()public view returns(Raffle){
+        return raffle;
+    }
 }
