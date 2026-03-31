@@ -16,13 +16,13 @@ contract NetworkConfig is CodeConstants{
         address coordinatorContract;
     }
 
-    function getNetworkConfig()public view returns(Network memory ){
-        if(block.chainid == ETH_SEPOLIA_CHAIN_ID){
+    function getNetworkConfig(uint256 chainId)public view returns(Network memory ){
+        if(chainId == ETH_SEPOLIA_CHAIN_ID){
             return Network({
                 coordinatorContract:0x694AA1769357215DE4FAC081bf1f309aDC325306
             });
         }
-        else if(block.chainid == LOCAL_CHAIN_ID){
+        else if(chainId == LOCAL_CHAIN_ID){
             return Network({
                 coordinatorContract: 0x694AA1769357215DE4FAC081bf1f309aDC325306
             });
