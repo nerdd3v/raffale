@@ -49,9 +49,21 @@ contract Raffle is VRFConsumerBaseV2Plus{
         emit raffleEntered(msg.sender);
     }
 
+    function timePassed()public view returns(bool){
+        if((block.timestamp - lastTimeStamp) >= lotteryInterval){
+            return true;
+        }
+        return false;
+    }
+
     function checkUpKeep(bytes calldata /* checkdata */)public view returns(bool upkeepNeeded, bytes memory /* checkData */){
         //function for automating the pick winner via chainlink automation contract
-        
+        bool timeHasPassed = timePassed();
+        bool isOpen = state == State.Open;
+        bool contractHasBalance = address(this).balance > 0 ether;
+        bool hasPlayers = contestants.length > 0;
+
+        return (timeHasPassed && isOpen && contractHasBalance && hasPlayers , "");
     }
 
     function requestingCoordinator()public {
