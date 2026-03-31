@@ -50,6 +50,7 @@ contract Raffle is VRFConsumerBaseV2Plus{
     }
 
     function checkUpKeep(bytes calldata /* checkdata */)public view returns(bool upkeepNeeded, bytes memory /* checkData */){
+        //function for automating the pick winner via chainlink automation contract
         
     }
 
