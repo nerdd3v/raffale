@@ -49,6 +49,10 @@ contract Raffle is VRFConsumerBaseV2Plus{
         emit raffleEntered(msg.sender);
     }
 
+    function checkUpKeep(bytes calldata /* checkdata */)public view returns(bool upkeepNeeded, bytes memory /* checkData */){
+        
+    }
+
     function requestingCoordinator()public {
         if(block.timestamp - lastTimeStamp < lotteryInterval){
             revert timeError();
