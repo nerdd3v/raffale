@@ -8,5 +8,15 @@ import {NetworkConfig} from "./NetworkConfig.s.sol";
 
 contract RaffleScript is Script{
     Raffle public raffle;
-    
+    NetworkConfig private configContract;
+    NetworkConfig.forConstructor private networkConfiguration;
+    function setup()public{
+        configContract = new NetworkConfig();
+    }
+
+    function run()public{
+        vm.startBroadcast();
+            networkConfiguration = configContract.getNetworkConfig(block.chainid);
+        vm.stopBroadcast();
+    }
 }

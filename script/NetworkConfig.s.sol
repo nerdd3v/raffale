@@ -14,10 +14,6 @@ error UnknownChain(uint256 chainId);
 
 contract NetworkConfig is CodeConstants, Script{
 
-    struct Network{
-        address coordinator;
-    }
-
     struct forConstructor{
         uint256 lotteryInterval;
         uint256 lastTimeStamp;
