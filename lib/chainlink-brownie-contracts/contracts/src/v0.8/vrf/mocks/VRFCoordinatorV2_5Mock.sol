@@ -52,7 +52,7 @@ contract VRFCoordinatorV2_5Mock is SubscriptionAPI, IVRFCoordinatorV2Plus {
   }
   mapping(uint256 => Request) internal s_requests; /* requestId */ /* request */
 
-  constructor(uint96 _baseFee, uint96 _gasPrice, int256 _weiPerUnitLink) SubscriptionAPI() {
+  constructor(uint96 _baseFee, uint96 _gasPrice, int256 _weiPerUnitLink)  {
     i_base_fee = _baseFee;
     i_gas_price = _gasPrice;
     i_wei_per_unit_link = _weiPerUnitLink;
