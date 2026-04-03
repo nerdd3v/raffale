@@ -25,5 +25,20 @@ contract RaffleTest is Test {
         assert(passed == false);
         console.log(time);
     }
-    
+
+    function testEntry()public payable{
+        address user = makeAddr("saket");
+        address user2 = makeAddr("sake");
+        vm.deal(user, 10 ether);
+        vm.deal(user2, 10 ether);
+
+        vm.prank(user);
+        raffle.enterRaffle{value: 1 ether}();
+        vm.prank(user2);
+        raffle.enterRaffle{value: 1 ether}();
+
+        assert(raffle.getContestantLenght() == 2);
+
+        console.log(raffle.getContestantLenght());
+    }
 }

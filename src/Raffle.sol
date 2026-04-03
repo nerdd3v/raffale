@@ -15,7 +15,7 @@ contract Raffle is VRFConsumerBaseV2Plus{
     enum State {Open, Closed}
     uint256 private constant entryFeeInWei = 100;
     // address private immutable owner;
-    address payable[] contestants;
+    address payable[] public contestants;
     uint256 private immutable lotteryInterval;
     uint256 private lastTimeStamp;
     uint256 private s_requestId;
@@ -57,6 +57,9 @@ contract Raffle is VRFConsumerBaseV2Plus{
         return (false, block.timestamp - lastTimeStamp);
     }
 
+    function getContestantLenght() public view returns(uint256){
+        return contestants.length;
+    }
     function checkUpKeep(bytes memory /* checkdata */)public view returns(bool upkeepNeeded, bytes memory /* checkData */){
         //function for automating the pick winner via chainlink automation contract
         (bool timeHasPassed,) = timePassed();
