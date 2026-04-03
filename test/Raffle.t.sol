@@ -43,7 +43,7 @@ contract RaffleTest is Test {
     }
 
     function testInterval()public view {
-        assert(raffle.getInterval() == 20);
+        assert(raffle.getInterval() == 28);
         console.log(raffle.getInterval());
     }
 }
