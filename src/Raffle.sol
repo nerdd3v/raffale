@@ -1,18 +1,24 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.19;
 
-import {VRFConsumerBaseV2Plus} from "../lib/chainlink-brownie-contracts/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
-import {IVRFCoordinatorV2Plus} from "../lib/chainlink-brownie-contracts/contracts/src/v0.8/vrf/dev/interfaces/IVRFCoordinatorV2Plus.sol";
-import {VRFV2PlusClient} from "../lib/chainlink-brownie-contracts/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
+import {VRFConsumerBaseV2Plus} from
+    "../lib/chainlink-brownie-contracts/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
+import {IVRFCoordinatorV2Plus} from
+    "../lib/chainlink-brownie-contracts/contracts/src/v0.8/vrf/dev/interfaces/IVRFCoordinatorV2Plus.sol";
+import {VRFV2PlusClient} from
+    "../lib/chainlink-brownie-contracts/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 
 error notEnoughEth();
 error timeError();
 error raffleNotOpen();
 error noUpkeepNeeded(uint256 balance);
 
-contract Raffle is VRFConsumerBaseV2Plus{
-    
-    enum State {Open, Closed}
+contract Raffle is VRFConsumerBaseV2Plus {
+    enum State {
+        Open,
+        Closed
+    }
+
     uint256 private constant entryFeeInWei = 100;
     // address private immutable owner;
     address payable[] public contestants;
@@ -22,13 +28,12 @@ contract Raffle is VRFConsumerBaseV2Plus{
     IVRFCoordinatorV2Plus public coordinator;
     // uint256 public rw;
 
-    State private state; 
-
+    State private state;
 
     event raffleEntered(address indexed player);
     event winnerDeclare(address indexed winner);
 
-    constructor(uint256 _lotteryInterval, address _vrfCoordinator)VRFConsumerBaseV2Plus(_vrfCoordinator){
+    constructor(uint256 _lotteryInterval, address _vrfCoordinator) VRFConsumerBaseV2Plus(_vrfCoordinator) {
         // owner = msg.sender;
         lotteryInterval = _lotteryInterval;
         lastTimeStamp = block.timestamp;
@@ -36,13 +41,12 @@ contract Raffle is VRFConsumerBaseV2Plus{
         state = State.Open;
     }
 
-    function enterRaffle()public payable{
-
-        if(state != State.Open){
+    function enterRaffle() public payable {
+        if (state != State.Open) {
             revert raffleNotOpen();
         }
 
-        if(msg.value < entryFeeInWei){
+        if (msg.value < entryFeeInWei) {
             revert notEnoughEth();
         }
         contestants.push(payable(msg.sender));
@@ -50,33 +54,38 @@ contract Raffle is VRFConsumerBaseV2Plus{
         emit raffleEntered(msg.sender);
     }
 
-    function timePassed()public view returns(bool, uint256){
-        if((block.timestamp - lastTimeStamp) >= lotteryInterval){
+    function timePassed() public view returns (bool, uint256) {
+        if ((block.timestamp - lastTimeStamp) >= lotteryInterval) {
             return (true, block.timestamp - lastTimeStamp);
         }
         return (false, block.timestamp - lastTimeStamp);
     }
 
-    function getContestantLenght() public view returns(uint256){
+    function getContestantLenght() public view returns (uint256) {
         return contestants.length;
     }
-    function checkUpKeep(bytes memory /* checkdata */)public view returns(bool upkeepNeeded, bytes memory /* checkData */){
+
+    function checkUpKeep(bytes memory /* checkdata */ )
+        public
+        view
+        returns (bool upkeepNeeded, bytes memory /* checkData */ )
+    {
         //function for automating the pick winner via chainlink automation contract
         (bool timeHasPassed,) = timePassed();
         bool isOpen = state == State.Open;
         bool contractHasBalance = address(this).balance > 0 ether;
         bool hasPlayers = contestants.length > 0;
 
-        return (timeHasPassed && isOpen && contractHasBalance && hasPlayers , "");
+        return (timeHasPassed && isOpen && contractHasBalance && hasPlayers, "");
     }
 
-    function getState()public view returns(State){
+    function getState() public view returns (State) {
         return state;
     }
 
-    function performUpkeep()public {
-        (bool upkeepNeeded,) = checkUpKeep(""); 
-        if(upkeepNeeded == false){
+    function performUpkeep() public {
+        (bool upkeepNeeded,) = checkUpKeep("");
+        if (upkeepNeeded == false) {
             revert noUpkeepNeeded(address(this).balance);
         }
         state = State.Closed;
@@ -87,9 +96,7 @@ contract Raffle is VRFConsumerBaseV2Plus{
             requestConfirmations: 3,
             callbackGasLimit: 200000,
             numWords: 1,
-            extraArgs: VRFV2PlusClient._argsToBytes(VRFV2PlusClient.ExtraArgsV1({
-                nativePayment: false
-            }))
+            extraArgs: VRFV2PlusClient._argsToBytes(VRFV2PlusClient.ExtraArgsV1({nativePayment: false}))
         });
 
         uint256 requestId = coordinator.requestRandomWords(request);
@@ -97,8 +104,8 @@ contract Raffle is VRFConsumerBaseV2Plus{
         s_requestId = requestId;
     }
 
-    function fulfillRandomWords(uint256 requestId, uint256[] calldata randomWords) internal override{
-        if (contestants.length == 0){
+    function fulfillRandomWords(uint256 requestId, uint256[] calldata randomWords) internal override {
+        if (contestants.length == 0) {
             revert("no people in raffale");
         }
         uint256 winnerIndex = randomWords[0] % contestants.length;
@@ -107,16 +114,15 @@ contract Raffle is VRFConsumerBaseV2Plus{
 
         (bool success,) = contestants[winnerIndex].call{value: address(this).balance}("");
 
-        if(success){
+        if (success) {
             emit winnerDeclare(contestants[winnerIndex]);
-        }
-        else{
+        } else {
             revert("the winner cannot be funded");
         }
         contestants = new address payable[](0);
     }
 
-    function getInterval()public view returns(uint256){
+    function getInterval() public view returns (uint256) {
         return lotteryInterval;
     }
 }

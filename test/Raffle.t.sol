@@ -20,13 +20,13 @@ contract RaffleTest is Test {
         assert(Raffle.State.Open == raffle.getState());
     }
 
-    function testTimePassed()public view{
+    function testTimePassed() public view {
         (bool passed, uint256 time) = raffle.timePassed();
         assert(passed == false);
         console.log(time);
     }
 
-    function testEntry()public payable{
+    function testEntry() public payable {
         address user = makeAddr("saket");
         address user2 = makeAddr("sake");
         vm.deal(user, 10 ether);
@@ -42,7 +42,7 @@ contract RaffleTest is Test {
         console.log(raffle.getContestantLenght());
     }
 
-    function testInterval()public view {
+    function testInterval() public view {
         assert(raffle.getInterval() == 28);
         console.log(raffle.getInterval());
     }
