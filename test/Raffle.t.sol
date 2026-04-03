@@ -4,6 +4,7 @@ pragma solidity ^0.8.13;
 import {Test} from "forge-std/Test.sol";
 import {RaffleScript} from "../script/Raffle.s.sol";
 import {Raffle} from "../src/Raffle.sol";
+import {console} from "../lib/forge-std/src/console.sol";
 
 contract RaffleTest is Test {
     RaffleScript public dc;
@@ -19,7 +20,10 @@ contract RaffleTest is Test {
         assert(Raffle.State.Open == raffle.getState());
     }
 
-    // function testFuzz_SetNumber(uint256 x) public {
-
-    // }
+    function testTimePassed()public view{
+        (bool passed, uint256 time) = raffle.timePassed();
+        assert(passed == false);
+        console.log(time);
+    }
+    
 }

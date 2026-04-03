@@ -50,16 +50,16 @@ contract Raffle is VRFConsumerBaseV2Plus{
         emit raffleEntered(msg.sender);
     }
 
-    function timePassed()public view returns(bool){
+    function timePassed()public view returns(bool, uint256){
         if((block.timestamp - lastTimeStamp) >= lotteryInterval){
-            return true;
+            return (true, block.timestamp - lastTimeStamp);
         }
-        return false;
+        return (false, block.timestamp - lastTimeStamp);
     }
 
     function checkUpKeep(bytes memory /* checkdata */)public view returns(bool upkeepNeeded, bytes memory /* checkData */){
         //function for automating the pick winner via chainlink automation contract
-        bool timeHasPassed = timePassed();
+        (bool timeHasPassed,) = timePassed();
         bool isOpen = state == State.Open;
         bool contractHasBalance = address(this).balance > 0 ether;
         bool hasPlayers = contestants.length > 0;
