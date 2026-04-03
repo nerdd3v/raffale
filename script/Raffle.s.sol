@@ -10,13 +10,13 @@ contract RaffleScript is Script{
     Raffle public raffle;
     NetworkConfig private configContract;
     NetworkConfig.forConstructor private networkConfiguration;
-    function setup()public{
+    function setUp()public{
         configContract = new NetworkConfig();
     }
 
     function run()public returns(Raffle){
+        networkConfiguration = configContract.getNetworkConfig(block.chainid);
         vm.startBroadcast();
-            networkConfiguration = configContract.getNetworkConfig(block.chainid);
             raffle = new Raffle({
                 _lotteryInterval: networkConfiguration.lotteryInterval,
                 _vrfCoordinator: networkConfiguration.coordinator

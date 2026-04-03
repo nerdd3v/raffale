@@ -67,6 +67,10 @@ contract Raffle is VRFConsumerBaseV2Plus{
         return (timeHasPassed && isOpen && contractHasBalance && hasPlayers , "");
     }
 
+    function getState()public view returns(State){
+        return state;
+    }
+
     function performUpkeep()public {
         (bool upkeepNeeded,) = checkUpKeep(""); 
         if(upkeepNeeded == false){

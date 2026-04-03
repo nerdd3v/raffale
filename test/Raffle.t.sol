@@ -1,24 +1,25 @@
 // SPDX-License-Identifier: UNLICENSED
-// pragma solidity ^0.8.13;
+pragma solidity ^0.8.13;
 
-// import {Test} from "forge-std/Test.sol";
-// import {Counter} from "../src/Counter.sol";
+import {Test} from "forge-std/Test.sol";
+import {RaffleScript} from "../script/Raffle.s.sol";
+import {Raffle} from "../src/Raffle.sol";
 
-// contract CounterTest is Test {
-//     Counter public counter;
+contract RaffleTest is Test {
+    RaffleScript public dc;
+    Raffle public raffle;
 
-//     function setUp() public {
-//         counter = new Counter();
-//         counter.setNumber(0);
-//     }
+    function setUp() public {
+        dc = new RaffleScript();
+        dc.setUp();
+        raffle = dc.run();
+    }
 
-//     function test_Increment() public {
-//         counter.increment();
-//         assertEq(counter.number(), 1);
-//     }
+    function testState() public view {
+        assert(Raffle.State.Open == raffle.getState());
+    }
 
-//     function testFuzz_SetNumber(uint256 x) public {
-//         counter.setNumber(x);
-//         assertEq(counter.number(), x);
-//     }
-// }
+    // function testFuzz_SetNumber(uint256 x) public {
+
+    // }
+}
