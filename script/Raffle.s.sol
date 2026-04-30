@@ -1,28 +1,21 @@
-//SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.9;
 
 import {Script} from "../lib/forge-std/src/Script.sol";
 import {Raffle} from "../src/Raffle.sol";
 import {NetworkConfig} from "./NetworkConfig.s.sol";
+import {console} from "../lib/forge-std/src/console.sol";
 
-contract RaffleScript is Script {
-    Raffle public raffle;
-    NetworkConfig private configContract;
-    NetworkConfig.forConstructor private networkConfiguration;
-
-    function setUp() public {
-        configContract = new NetworkConfig();
+contract RaffleSript is Script{
+    function setUp() public{
+        Raffle rf;
     }
 
-    function run() public returns (Raffle) {
-        networkConfiguration = configContract.getNetworkConfig(block.chainid);
-        vm.startBroadcast();
-        raffle = new Raffle({
-            _lotteryInterval: networkConfiguration.lotteryInterval,
-            _vrfCoordinator: networkConfiguration.coordinator
-        });
-        vm.stopBroadcast();
-        return raffle;
+    function run() public {
+        NetworkConfig nc = new NetworkConfig(block.chainid);
+        NetworkConfig.NetworkConfiguration memory c = nc.getLocalChainConfiguration();
+
+        console.log(c.coordinator);
     }
 }

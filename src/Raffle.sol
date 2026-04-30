@@ -26,7 +26,6 @@ contract Raffle is VRFConsumerBaseV2Plus {
     uint256 private lastTimeStamp;
     uint256 private s_requestId;
     IVRFCoordinatorV2Plus public coordinator;
-    // uint256 public rw;
 
     State private state;
 
