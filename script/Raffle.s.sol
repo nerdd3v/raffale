@@ -7,15 +7,18 @@ import {Raffle} from "../src/Raffle.sol";
 import {NetworkConfig} from "./NetworkConfig.s.sol";
 import {console} from "../lib/forge-std/src/console.sol";
 
-contract RaffleSript is Script{
+contract RaffleScript is Script{
+    NetworkConfig nc;
+    Raffle rf;
     function setUp() public{
-        Raffle rf;
-    }
+        nc = new NetworkConfig(block.chainid);
+    }  
 
-    function run() public {
-        NetworkConfig nc = new NetworkConfig(block.chainid);
+    function run() public returns(Raffle){
         NetworkConfig.NetworkConfiguration memory c = nc.getLocalChainConfiguration();
-
-        console.log(c.coordinator);
+        vm.startBroadcast();
+        rf = new Raffle(c.lotteryInterval, c.coordinator);
+        vm.stopBroadcast();
+        return rf;
     }
 }

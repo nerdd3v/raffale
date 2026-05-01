@@ -7,13 +7,14 @@ import {Raffle} from "../src/Raffle.sol";
 import {console} from "../lib/forge-std/src/console.sol";
 
 contract RaffleTest is Test {
-    RaffleScript public dc;
+    RaffleScript public rs;
     Raffle public raffle;
 
     function setUp() public {
-        dc = new RaffleScript();
-        dc.setUp();
-        raffle = dc.run();
+        rs = new RaffleScript();
+
+        rs.setUp();
+        raffle = rs.run();
     }
 
     function testState() public view {
@@ -43,7 +44,7 @@ contract RaffleTest is Test {
     }
 
     function testInterval() public view {
-        assert(raffle.getInterval() == 28);
+        assert(raffle.getInterval() == 20);
         console.log(raffle.getInterval());
     }
 }
