@@ -12,9 +12,9 @@ abstract contract CodeConstants{
     uint256 internal constant MAINNET_CHAIN_ID = 1;
     uint256 internal constant SEPOLIA_CHAIN_ID = 11155111;
 
-    uint96 internal constant BASE_FEE = 1000;
-    uint96 internal constant GAS_PRICE = 1000;
-    int256 internal constant WEI_PER_UNIT_LINK = 1000;
+    uint96 internal constant BASE_FEE = 0.1 ether;
+    uint96 internal constant GAS_PRICE = 1e9;
+    int256 internal constant WEI_PER_UNIT_LINK = 4e15;
 
     address internal constant FOUNDRY_DEFAULT_ADDRESS = 0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38;
 }

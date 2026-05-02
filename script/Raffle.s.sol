@@ -17,7 +17,7 @@ contract Deployment is Script{
 
         // vm.startBroadcast();
         nc.subId = VRFCoordinatorV2_5Mock(nc.coordinator).createSubscription();
-        VRFCoordinatorV2_5Mock(nc.coordinator).fundSubscription(nc.subId, 100 ether);
+        VRFCoordinatorV2_5Mock(nc.coordinator).fundSubscription(nc.subId, 0.1 ether);
         rf = new Raffle(nc.lotteryInterval, nc.coordinator, nc.subId);
         VRFCoordinatorV2_5Mock(nc.coordinator).addConsumer(nc.subId, address(rf));
         address newUser = makeAddr("saket");
