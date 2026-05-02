@@ -18,7 +18,8 @@ contract Raffle is VRFConsumerBaseV2Plus {
         Open,
         Closed
     }
-
+    
+    address private s_winner;
     uint256 private constant entryFeeInWei = 100;
     // address private immutable owner;
     address payable[] public contestants;
@@ -26,18 +27,20 @@ contract Raffle is VRFConsumerBaseV2Plus {
     uint256 private lastTimeStamp;
     uint256 private s_requestId;
     IVRFCoordinatorV2Plus public coordinator;
+    uint256 private _subId;
 
     State private state;
 
     event raffleEntered(address indexed player);
     event winnerDeclare(address indexed winner);
 
-    constructor(uint256 _lotteryInterval, address _vrfCoordinator) VRFConsumerBaseV2Plus(_vrfCoordinator) {
+    constructor(uint256 _lotteryInterval, address _vrfCoordinator, uint256 subId) VRFConsumerBaseV2Plus(_vrfCoordinator) {
         // owner = msg.sender;
         lotteryInterval = _lotteryInterval;
         lastTimeStamp = block.timestamp;
         coordinator = IVRFCoordinatorV2Plus(_vrfCoordinator);
         state = State.Open;
+        _subId = subId;
     }
 
     function enterRaffle() public payable {
@@ -82,7 +85,7 @@ contract Raffle is VRFConsumerBaseV2Plus {
         return state;
     }
 
-    function performUpkeep() public {
+    function performUpkeep() public returns(uint256){
         (bool upkeepNeeded,) = checkUpKeep("");
         if (upkeepNeeded == false) {
             revert noUpkeepNeeded(address(this).balance);
@@ -91,23 +94,25 @@ contract Raffle is VRFConsumerBaseV2Plus {
 
         VRFV2PlusClient.RandomWordsRequest memory request = VRFV2PlusClient.RandomWordsRequest({
             keyHash: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae,
-            subId: 43613802726724484435274018080008737583135228260117101033074813529169333276170,
+            subId: _subId,
             requestConfirmations: 3,
             callbackGasLimit: 200000,
-            numWords: 1,
+            numWords: 7,
             extraArgs: VRFV2PlusClient._argsToBytes(VRFV2PlusClient.ExtraArgsV1({nativePayment: false}))
         });
 
         uint256 requestId = coordinator.requestRandomWords(request);
 
         s_requestId = requestId;
+        return s_requestId;
     }
 
     function fulfillRandomWords(uint256 requestId, uint256[] calldata randomWords) internal override {
         if (contestants.length == 0) {
             revert("no people in raffale");
         }
-        uint256 winnerIndex = randomWords[0] % contestants.length;
+        uint256 winnerIndex = randomWords[1] % contestants.length;
+        s_winner = address(contestants[winnerIndex]);
         state = State.Open;
         lastTimeStamp = block.timestamp;
 
@@ -123,5 +128,9 @@ contract Raffle is VRFConsumerBaseV2Plus {
 
     function getInterval() public view returns (uint256) {
         return lotteryInterval;
+    }
+
+    function getWinner()public view returns(address){
+        return s_winner;
     }
 }
