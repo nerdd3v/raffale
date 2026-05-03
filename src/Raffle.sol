@@ -1,19 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.19;
 
-import {VRFConsumerBaseV2Plus} from
-    "../lib/chainlink-brownie-contracts/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
-import {IVRFCoordinatorV2Plus} from
-    "../lib/chainlink-brownie-contracts/contracts/src/v0.8/vrf/dev/interfaces/IVRFCoordinatorV2Plus.sol";
-import {VRFV2PlusClient} from
-    "../lib/chainlink-brownie-contracts/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
+import {VRFConsumerBaseV2} from
+    "../lib/chainlink-brownie-contracts/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
+import {VRFCoordinatorV2Interface} from "../lib/chainlink-brownie-contracts/contracts/src/v0.8/vrf/interfaces/VRFCoordinatorV2Interface.sol";
+
 
 error notEnoughEth();
 error timeError();
 error raffleNotOpen();
 error noUpkeepNeeded(uint256 balance);
 
-contract Raffle is VRFConsumerBaseV2Plus {
+contract Raffle is VRFConsumerBaseV2 {
     enum State {
         Open,
         Closed
@@ -26,19 +24,24 @@ contract Raffle is VRFConsumerBaseV2Plus {
     uint256 private immutable lotteryInterval;
     uint256 private lastTimeStamp;
     uint256 private s_requestId;
-    IVRFCoordinatorV2Plus public coordinator;
-    uint256 private _subId;
+    VRFCoordinatorV2Interface public coordinator;
+    uint64 private _subId;
+    uint32 public constant cgl = 20000;
+    uint32 public constant nw = 7;
+
+    uint16 public constant requestConfirmations =3;
+    bytes32 public constant kh = 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae;
 
     State private state;
 
     event raffleEntered(address indexed player);
     event winnerDeclare(address indexed winner);
 
-    constructor(uint256 _lotteryInterval, address _vrfCoordinator, uint256 subId) VRFConsumerBaseV2Plus(_vrfCoordinator) {
+    constructor(uint256 _lotteryInterval, address _vrfCoordinator, uint64 subId) VRFConsumerBaseV2(_vrfCoordinator) {
         // owner = msg.sender;
         lotteryInterval = _lotteryInterval;
         lastTimeStamp = block.timestamp;
-        coordinator = IVRFCoordinatorV2Plus(_vrfCoordinator);
+        coordinator = VRFCoordinatorV2Interface(_vrfCoordinator);
         state = State.Open;
         _subId = subId;
     }
@@ -92,27 +95,18 @@ contract Raffle is VRFConsumerBaseV2Plus {
         }
         state = State.Closed;
 
-        VRFV2PlusClient.RandomWordsRequest memory request = VRFV2PlusClient.RandomWordsRequest({
-            keyHash: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae,
-            subId: _subId,
-            requestConfirmations: 3,
-            callbackGasLimit: 200000,
-            numWords: 7,
-            extraArgs: VRFV2PlusClient._argsToBytes(VRFV2PlusClient.ExtraArgsV1({nativePayment: false}))
-        });
+        uint256 request = coordinator.requestRandomWords(kh,_subId, requestConfirmations, cgl, nw);
 
-        uint256 requestId = coordinator.requestRandomWords(request);
-
-        s_requestId = requestId;
+        s_requestId = request;
         return s_requestId;
     }
 
-    function fulfillRandomWords(uint256 requestId, uint256[] calldata randomWords) internal override {
+    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) internal override {
         if (contestants.length == 0) {
             revert("no people in raffale");
         }
-        uint256 winnerIndex = randomWords[1] % contestants.length;
-        s_winner = address(contestants[winnerIndex]);
+        uint256 winnerIndex = randomWords[0] % contestants.length;
+        s_winner = contestants[winnerIndex];
         state = State.Open;
         lastTimeStamp = block.timestamp;
 
@@ -134,3 +128,7 @@ contract Raffle is VRFConsumerBaseV2Plus {
         return s_winner;
     }
 }
+
+
+// raffle -> 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9
+// mock -> 0x5FbDB2315678afecb367f032d93F642f64180aa3
